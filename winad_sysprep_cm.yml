@@ -1,0 +1,47 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: sysprep-windows-server
+  namespace: build-winvm
+  uid: 91195a92-0b7f-4fc4-9891-a91513d02201
+  resourceVersion: '15577360'
+  creationTimestamp: '2024-03-26T18:56:25Z'
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: v1
+      time: '2024-03-26T18:56:25Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:data':
+          .: {}
+          'f:unattend.xml': {}
+          'f:winad.ps1': {}
+        'f:immutable': {}
+immutable: false
+data:
+  unattend.xml: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<unattend xmlns=\"urn:schemas-microsoft-com:unattend\" xmlns:wcm=\"http://schemas.microsoft.com/WMIConfig/2002/State\">\r\n    <settings pass=\"specialize\">\r\n        <component name=\"Microsoft-Windows-International-Core\" processorArchitecture=\"amd64\" publicKeyToken=\"31bf3856ad364e35\" language=\"neutral\" versionScope=\"nonSxS\">\r\n            <InputLocale>en-US</InputLocale>\r\n            <SystemLocale>en-US</SystemLocale>\r\n            <UILanguage>en-US</UILanguage>\r\n            <UserLocale>en-US</UserLocale>\r\n            <UILanguageFallback>en-US</UILanguageFallback>\r\n        </component>\r\n        <component name=\"Microsoft-Windows-Deployment\" processorArchitecture=\"amd64\" publicKeyToken=\"31bf3856ad364e35\" language=\"neutral\" versionScope=\"nonSxS\">\r\n            <RunSynchronous>\r\n                <RunSynchronousCommand wcm:action=\"add\">\r\n                    <Order>1</Order>\r\n                    <Path>PowerShell -ExecutionPolicy Bypass -NoProfile E:\\winad.ps1</Path>\r\n                    <Description>Run WIN AD Config</Description>\r\n                    <WillReboot>Always</WillReboot>\r\n                </RunSynchronousCommand>\r\n            </RunSynchronous>\r\n        </component>\r\n        <component name=\"Microsoft-Windows-Shell-Setup\" processorArchitecture=\"amd64\" publicKeyToken=\"31bf3856ad364e35\" language=\"neutral\" versionScope=\"nonSxS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n            <AutoLogon>\r\n                <Password>\r\n                    <Value>TestPa$$word1234</Value>\r\n                    <PlainText>true</PlainText>\r\n                </Password>\r\n                <Domain>win</Domain>\r\n                <Enabled>true</Enabled>\r\n                <LogonCount>1</LogonCount>\r\n                <Username>Administrator</Username>\r\n            </AutoLogon>\r\n        </component>\r\n    </settings>\r\n    <settings pass=\"oobeSystem\">\r\n        <component name=\"Microsoft-Windows-Shell-Setup\" processorArchitecture=\"amd64\" publicKeyToken=\"31bf3856ad364e35\" language=\"neutral\" versionScope=\"nonSxS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n            <OOBE>\r\n                <HideEULAPage>true</HideEULAPage>\r\n                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>\r\n                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>\r\n                <HideLocalAccountScreen>true</HideLocalAccountScreen>\r\n                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>\r\n            </OOBE>\r\n            <UserAccounts>\r\n                <AdministratorPassword>\r\n                    <Value>TestPa$$word1234</Value>\r\n                    <PlainText>true</PlainText>\r\n                </AdministratorPassword>\r\n            </UserAccounts>\r\n            <FirstLogonCommands>\r\n                <SynchronousCommand wcm:action=\"add\">\r\n                    <Description>Add DHCP Config</Description>\r\n                    <Order>1</Order>\r\n                    <CommandLine>PowerShell -ExecutionPolicy Bypass -NoProfile E:\\firstlogon.ps1</CommandLine>\r\n                </SynchronousCommand>\r\n            </FirstLogonCommands>\r\n        </component>\r\n        <component name=\"Microsoft-Windows-International-Core\" processorArchitecture=\"amd64\" publicKeyToken=\"31bf3856ad364e35\" language=\"neutral\" versionScope=\"nonSxS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n            <InputLocale>en-US</InputLocale>\r\n            <SystemLocale>en-US</SystemLocale>\r\n            <UILanguage>en-US</UILanguage>\r\n            <UILanguageFallback>en-US</UILanguageFallback>\r\n            <UserLocale>en-US</UserLocale>\r\n        </component>\r\n    </settings>\r\n    <cpi:offlineImage cpi:source=\"catalog:e:/install_windows server 2022 serverdatacenter.clg\" xmlns:cpi=\"urn:schemas-microsoft-com:cpi\" />\r\n</unattend>\r\n"
+  firstlogon.ps1: |-
+    Import-Module dhcpserver
+    Import-Module ADDSDeployment
+    Start-Transcript -Path "C:\dhcpaddin.txt" -NoClobber
+    Add-DhcpServerInDC
+    Set-DhcpServerv4OptionValue -DnsDomain win.pm874.sandbox2129.opentlc.com -DnsServer 192.168.1.2
+  winad.ps1: |-
+    Start-Transcript -Path "C:\winadtranscript.txt" -NoClobber
+    Install-WindowsFeature DHCP -IncludeManagementTools
+    Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
+    Import-Module ADDSDeployment
+
+
+    New-NetIPAddress -IPAddress 192.168.1.2 -InterfaceAlias "Ethernet" -AddressFamily IPv4 -PrefixLength 24 -DefaultGateway 192.168.1.1
+    Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 192.168.1.2
+    netsh dhcp add securitygroups
+    Restart-Service dhcpserver
+    Add-DhcpServerv4Scope -name "Corpnet" -StartRange 192.168.1.10 -EndRange 192.168.1.254 -SubnetMask 255.255.255.0 -State Active
+    Set-DhcpServerv4OptionValue -OptionID 3 -Value 192.168.1.1 -ScopeID 192.168.1.0
+ 
+    $secure = convertto-securestring -String 'TestPa$$word1234' -asplaintext -force
+    $UserAccount = Get-LocalUser -Name "Administrator"
+    $UserAccount | Set-LocalUser -Password $secure
+    Install-ADDSForest -CreateDnsDelegation:$false -DomainName "win.pm874.sandbox2129.opentlc.com" -SafeModeAdministratorPassword $secure -Force:$true -InstallDns:$true -NoRebootOnCompletion:$true

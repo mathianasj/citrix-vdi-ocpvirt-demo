@@ -1,0 +1,59 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: win11-desktop-oobe
+  namespace: build-winvm
+  uid: e8a6be74-9fb2-4f24-a3a6-3c50e9d55a17
+  resourceVersion: '6581499'
+  creationTimestamp: '2024-03-22T15:54:03Z'
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: v1
+      time: '2024-03-22T19:14:17Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:data':
+          .: {}
+          'f:Unattend.xml': {}
+        'f:immutable': {}
+immutable: false
+data:
+  Unattend.xml: |-
+    <?xml version="1.0" encoding="utf-8"?>
+    <unattend xmlns="urn:schemas-microsoft-com:unattend">
+        <settings pass="oobeSystem">
+            <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <UserAccounts>
+                    <AdministratorPassword>
+                        <Value>dABlAHMAdABhAGQAbQBpAG4AcABhAHMAcwB3AG8AcgBkAEEAZABtAGkAbgBpAHMAdAByAGEAdABvAHIAUABhAHMAcwB3AG8AcgBkAA==</Value>
+                        <PlainText>false</PlainText>
+                    </AdministratorPassword>
+                    <LocalAccounts>
+                        <LocalAccount wcm:action="add">
+                            <Password>
+                                <Value>dABlAHMAdABwAGEAcwBzAHcAbwByAGQAUABhAHMAcwB3AG8AcgBkAA==</Value>
+                                <PlainText>false</PlainText>
+                            </Password>
+                            <DisplayName>Test Account</DisplayName>
+                            <Name>test</Name>
+                        </LocalAccount>
+                    </LocalAccounts>
+                </UserAccounts>
+            </component>
+        </settings>
+        <settings pass="specialize">
+            <component name="Microsoft-Windows-UnattendedJoin" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <Identification>
+                    <Credentials>
+                        <Domain>win</Domain>
+                        <Password>TestPa$$word</Password>
+                        <Username>Administrator</Username>
+                    </Credentials>
+                    <JoinDomain>win.pm874.sandbox2129.opentlc.com</JoinDomain>
+                    <DebugJoin>true</DebugJoin>
+                </Identification>
+            </component>
+        </settings>
+        <cpi:offlineImage cpi:source="catalog:c:/users/mathi/documents/install_windows 11 pro.clg" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
+    </unattend>

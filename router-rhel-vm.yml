@@ -1,0 +1,115 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: centos-stream9-nat
+  namespace: build-winvm
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        creationTimestamp: null
+        name: centos-stream9-nat
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: centos-stream9
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 30Gi
+  running: true
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: small
+        vm.kubevirt.io/os: centos-stream9
+        vm.kubevirt.io/workload: server
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: centos-stream9-nat
+        kubevirt.io/size: small
+    spec:
+      architecture: amd64
+      domain:
+        cpu:
+          cores: 1
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: virtio
+              name: rootdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - macAddress: '02:df:7a:00:00:3a'
+              masquerade: {}
+              model: virtio
+              name: default
+            - bridge: {}
+              macAddress: '02:df:7a:00:00:3b'
+              model: virtio
+              name: nic-quaint-hornet
+          networkInterfaceMultiqueue: true
+          rng: {}
+        machine:
+          type: pc-q35-rhel9.2.0
+        memory:
+          guest: 2Gi
+        resources: {}
+      networks:
+        - name: default
+          pod: {}
+        - multus:
+            networkName: l2
+          name: nic-quaint-hornet
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - dataVolume:
+            name: centos-stream9-nat
+          name: rootdisk
+        - cloudInitNoCloud:
+            networkData: |
+              network:
+                version: 2
+                ethernets:
+                  eth1: 
+                    addresses:
+                      - 192.168.1.1/24
+            userData: |-
+              #cloud-config
+              user: centos
+              password: TestPa$$word
+              chpasswd: { expire: False }
+              write_files:
+                - path: /run/scripts/setup-nat.sh
+                  content: |
+                    #!/bin/bash
+
+                    sudo dnf install -y iptables iptables-services
+
+                    
+
+                    sudo iptables -F
+                    sudo iptables -t nat -F
+                    sudo iptables -t mangle -F
+                    sudo iptables -X
+                    sudo iptables -t nat -X
+                    sudo iptables -t mangle -X
+                    sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+                    sudo iptables -A FORWARD -i eth1 -j ACCEPT
+
+                    sudo service iptables save
+                    sudo systemctl start iptables
+                    sudo systemctl enable iptables
+  
+                  permissions: '0755'
+              runcmd:
+                - echo 1 > /proc/sys/net/ipv4/ip_forward
+                - sed -i -e 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+                - [ sh, "/run/scripts/setup-nat.sh" ]
+          name: cloudinitdisk

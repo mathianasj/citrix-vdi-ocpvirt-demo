@@ -1,0 +1,114 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: win11-desktop
+  namespace: build-winvm
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        creationTimestamp: null
+        name: win11-desktop
+      spec:
+        sourceRef:
+          kind: DataSource
+          name: win11
+          namespace: openshift-virtualization-os-images
+        storage:
+          resources:
+            requests:
+              storage: 64Gi
+  running: true
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: medium
+        vm.kubevirt.io/os: windows11
+        vm.kubevirt.io/workload: desktop
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: win11-desktop
+        kubevirt.io/size: medium
+    spec:
+      architecture: amd64
+      domain:
+        clock:
+          timer:
+            hpet:
+              present: false
+            hyperv: {}
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+          utc: {}
+        cpu:
+          cores: 2
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - disk:
+                bus: sata
+              name: rootdisk
+            - cdrom:
+                bus: sata
+              name: windows-drivers-disk
+            - cdrom:
+                bus: sata
+              name: sysprep
+          inputs:
+            - bus: usb
+              name: tablet
+              type: tablet
+          interfaces:
+            - bridge: {}
+              macAddress: '02:df:7a:00:00:23'
+              model: e1000e
+              name: default
+          tpm: {}
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            reenlightenment: {}
+            ipi: {}
+            synic: {}
+            synictimer:
+              direct: {}
+            spinlocks:
+              spinlocks: 8191
+            reset: {}
+            relaxed: {}
+            vpindex: {}
+            runtime: {}
+            tlbflush: {}
+            frequencies: {}
+            vapic: {}
+          smm: {}
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: true
+        machine:
+          type: pc-q35-rhel9.2.0
+        memory:
+          guest: 4Gi
+        resources: {}
+      networks:
+        - multus:
+            networkName: l2
+          name: default
+      terminationGracePeriodSeconds: 3600
+      volumes:
+        - dataVolume:
+            name: win11-desktop
+          name: rootdisk
+        - containerDisk:
+            image: 'registry.redhat.io/container-native-virtualization/virtio-win-rhel9@sha256:5b7335507d8b86e977a3ece05cdfd40980120013fccb752a483ebf905a4e6726'
+          name: windows-drivers-disk
+        - name: sysprep
+          sysprep:
+            configMap:
+              name: win11-desktop-oobe

@@ -1,0 +1,147 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    tekton.dev/tags: kubevirt
+    pipeline.openshift.io/started-by: cluster-admin
+    tekton.dev/categories: Automation
+    artifacthub.io/provider: KubeVirt
+    chains.tekton.dev/signed: 'true'
+    tekton.dev/platforms: linux/amd64
+    tekton.dev/pipelines.minVersion: 0.43.0
+    artifacthub.io/category: integration-delivery
+    artifacthub.io/recommendations: |
+      - url: https://kubevirt.io/
+    artifacthub.io/maintainers: |
+      - name: KubeVirt Tekton tasks maintainers
+        email: kubevirt-tekton-tasks@redhat.com
+    tekton.dev/displayName: KubeVirt Windows UEFI installer
+  resourceVersion: '4173002'
+  name: windows-efi-installer-ml0etd
+  uid: 721ac627-8b28-4585-a87d-4fecef590267
+  creationTimestamp: '2024-03-21T16:05:39Z'
+  generation: 1
+  managedFields:
+    - apiVersion: tekton.dev/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:tekton.dev/platforms': {}
+            'f:artifacthub.io/category': {}
+            .: {}
+            'f:artifacthub.io/recommendations': {}
+            'f:artifacthub.io/maintainers': {}
+            'f:tekton.dev/displayName': {}
+            'f:tekton.dev/tags': {}
+            'f:tekton.dev/categories': {}
+            'f:artifacthub.io/provider': {}
+            'f:tekton.dev/pipelines.minVersion': {}
+            'f:pipeline.openshift.io/started-by': {}
+          'f:labels':
+            .: {}
+            'f:app.kubernetes.io/version': {}
+            'f:tekton.dev/pipeline': {}
+        'f:spec':
+          .: {}
+          'f:params': {}
+          'f:pipelineRef':
+            .: {}
+            'f:name': {}
+          'f:status': {}
+          'f:workspaces': {}
+      manager: Mozilla
+      operation: Update
+      time: '2024-03-21T16:05:39Z'
+    - apiVersion: tekton.dev/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:chains.tekton.dev/signed': {}
+          'f:finalizers':
+            .: {}
+            'v:"chains.tekton.dev/pipelinerun"': {}
+      manager: openshift-pipelines-chains-controller
+      operation: Update
+      time: '2024-03-21T16:29:55Z'
+    - apiVersion: tekton.dev/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:finallyStartTime': {}
+          'f:results': {}
+          'f:conditions': {}
+          .: {}
+          'f:childReferences': {}
+          'f:pipelineSpec':
+            .: {}
+            'f:description': {}
+            'f:finally': {}
+            'f:params': {}
+            'f:results': {}
+            'f:tasks': {}
+          'f:provenance':
+            .: {}
+            'f:featureFlags':
+              'f:ScopeWhenExpressionsToTask': {}
+              'f:SetSecurityContext': {}
+              'f:DisableCredsInit': {}
+              'f:DisableAffinityAssistant': {}
+              'f:EnableKeepPodOnCancel': {}
+              'f:VerificationNoMatchPolicy': {}
+              'f:RunningInEnvWithInjectedSidecars': {}
+              'f:EnableCELInWhenExpression': {}
+              'f:EnableTektonOCIBundles': {}
+              .: {}
+              'f:MaxResultSize': {}
+              'f:AwaitSidecarReadiness': {}
+              'f:EnableProvenanceInStatus': {}
+              'f:EnableParamEnum': {}
+              'f:Coschedule': {}
+              'f:ResultExtractionMethod': {}
+              'f:EnableStepActions': {}
+              'f:EnableAPIFields': {}
+              'f:RequireGitSSHSecretKnownHosts': {}
+              'f:EnforceNonfalsifiability': {}
+              'f:SendCloudEventsForRuns': {}
+          'f:startTime': {}
+          'f:completionTime': {}
+      manager: openshift-pipelines-controller
+      operation: Update
+      subresource: status
+      time: '2024-03-21T16:29:55Z'
+  namespace: build-winvm
+  finalizers:
+    - chains.tekton.dev/pipelinerun
+  labels:
+    app.kubernetes.io/version: v0.19.0
+    tekton.dev/pipeline: windows-efi-installer
+spec:
+  params:
+    - name: winImageDownloadURL
+      value: 'https://software.download.prss.microsoft.com/dbazure/Win11_23H2_English_x64v2.iso?t=abe972b3-364d-4389-bc63-da9184c77ca4&P1=1711116784&P2=601&P3=2&P4=dj1%2fER0AEbWkDMuE65GxsoRXeO%2fw2ur%2feXzDzaFPw44yzThKYKwwGEkhB4Q5wUadTJyfsADGkixOq9RCUjbQHMZzdEgfD9BwT3IbJljt09QstXClG6QHBc05WO%2fG7mkP7jVU4Mk6xHA9aGdEQWfblkziPZxCLpGipI2%2b99ZLPsgsGyNKKpo3kNpxhJBAs7Eektthakvjq8eB5Az8aqA499kGAc48SgzUASs6DoAcPxANzE6dtxsHBVfJUXY5mzifi13r%2bJXCunaynD0qOASyaRohnI2b1%2fKq1kqKi3NOYLHFn9uOlYgvxTCiGTfs6Tgp5MQpmEqMW%2fucNMdxMi%2fSPQ%3d%3d'
+    - name: instanceTypeName
+      value: u1.large
+    - name: instanceTypeKind
+      value: VirtualMachineClusterInstancetype
+    - name: preferenceName
+      value: windows.11
+    - name: virtualMachinePreferenceKind
+      value: VirtualMachineClusterPreference
+    - name: autounattendConfigMapName
+      value: windows11-autounattend
+    - name: virtioContainerDiskName
+      value: 'quay.io/kubevirt/virtio-container-disk:v1.2.0'
+    - name: baseDvName
+      value: win11
+    - name: baseDvNamespace
+      value: openshift-virtualization-os-images
+    - name: isoDVName
+      value: win11
+  pipelineRef:
+    name: windows-efi-installer
+  taskRunTemplate:
+    serviceAccountName: pipeline
+  timeouts:
+    pipeline: 1h0m0s

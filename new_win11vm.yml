@@ -1,0 +1,22 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: sysprep-win11-desktop-oobe
+  namespace: build-winvm
+  uid: 2d003d41-98e6-4a36-9307-8d2e2031ab80
+  resourceVersion: '13403293'
+  creationTimestamp: '2024-03-22T19:15:56Z'
+  managedFields:
+    - manager: Mozilla
+      operation: Update
+      apiVersion: v1
+      time: '2024-03-25T20:55:53Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:data':
+          .: {}
+          'f:Unattend.xml': {}
+        'f:immutable': {}
+immutable: false
+data:
+  Unattend.xml: "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<unattend xmlns=\"urn:schemas-microsoft-com:unattend\">\r\n    <settings pass=\"oobeSystem\">\r\n        <component name=\"Microsoft-Windows-Shell-Setup\" processorArchitecture=\"amd64\" publicKeyToken=\"31bf3856ad364e35\" language=\"neutral\" versionScope=\"nonSxS\" xmlns:wcm=\"http://schemas.microsoft.com/WMIConfig/2002/State\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n            <UserAccounts>\r\n                <AdministratorPassword>\r\n                    <Value>dABlAHMAdABhAGQAbQBpAG4AcABhAHMAcwB3AG8AcgBkAEEAZABtAGkAbgBpAHMAdAByAGEAdABvAHIAUABhAHMAcwB3AG8AcgBkAA==</Value>\r\n                    <PlainText>false</PlainText>\r\n                </AdministratorPassword>\r\n                <LocalAccounts>\r\n                    <LocalAccount wcm:action=\"add\">\r\n                        <Password>\r\n                            <Value>dABlAHMAdABwAGEAcwBzAHcAbwByAGQAUABhAHMAcwB3AG8AcgBkAA==</Value>\r\n                            <PlainText>false</PlainText>\r\n                        </Password>\r\n                        <DisplayName>Test Account</DisplayName>\r\n                        <Name>test</Name>\r\n                    </LocalAccount>\r\n                </LocalAccounts>\r\n            </UserAccounts>\r\n            <OOBE>\r\n                <HideEULAPage>true</HideEULAPage>\r\n                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>\r\n                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>\r\n            </OOBE>\r\n        </component>\r\n    </settings>\r\n    <settings pass=\"specialize\">\r\n        <component name=\"Microsoft-Windows-UnattendedJoin\" processorArchitecture=\"amd64\" publicKeyToken=\"31bf3856ad364e35\" language=\"neutral\" versionScope=\"nonSxS\" xmlns:wcm=\"http://schemas.microsoft.com/WMIConfig/2002/State\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n            <Identification>\r\n                <Credentials>\r\n                    <Domain>win</Domain>\r\n                    <Password>TestPa$$word</Password>\r\n                    <Username>Administrator</Username>\r\n                </Credentials>\r\n                <JoinDomain>win.pm874.sandbox2129.opentlc.com</JoinDomain>\r\n                <DebugJoin>true</DebugJoin>\r\n            </Identification>\r\n        </component>\r\n    </settings>\r\n    <cpi:offlineImage cpi:source=\"catalog:c:/users/mathi/documents/install_windows 11 pro.clg\" xmlns:cpi=\"urn:schemas-microsoft-com:cpi\" />\r\n</unattend>\r\n"

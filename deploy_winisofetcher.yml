@@ -1,0 +1,47 @@
+---
+
+- name: Install OpenShift Pipelines
+  hosts: all
+  tasks:
+    - name: install pre-requisites
+      pip:
+        name:
+          - openshift
+          - pyyaml
+          - kubernetes 
+    - name: Add buildconfig for iso url fetcher
+      kubernetes.core.k8s:
+        state: present
+        namespace: build-winvm
+        definition:
+          kind: BuildConfig
+          apiVersion: build.openshift.io/v1
+          metadata:
+            name: buildiso
+            namespace: build-winvm
+          spec:
+            output:
+              to:
+                kind: ImageStreamTag
+                name: 'pull-win-iso:latest'
+            strategy:
+              type: Docker
+              dockerStrategy:
+                from:
+                  kind: DockerImage
+                  name: registry.access.redhat.com/ubi9/python-311
+                volumes:
+                  - name: etc-pki-entitlement
+                    source:
+                      type: Secret
+                      secret:
+                        secretName: etc-pki-entitlement
+                        defaultMode: 420
+                    mounts:
+                      - destinationPath: /etc/pki/entitlement
+            source:
+              type: Git
+              git:
+                uri: 'https://github.com/mathianasj/citrix-vdi-ocpvirt-demo.git'
+                ref: master
+              contextDir: getiso
