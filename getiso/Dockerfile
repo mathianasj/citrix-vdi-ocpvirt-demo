@@ -1,6 +1,7 @@
 FROM registry.access.redhat.com/ubi9/python-311
 
 COPY iso.py .
+COPY getserveriso.sh .
 
 USER 0
 
