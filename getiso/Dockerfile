@@ -1,7 +1,7 @@
 FROM registry.access.redhat.com/ubi9/python-311
 
-COPY iso.py .
-COPY getserveriso.sh .
+COPY iso.py /opt/app-root/src/
+COPY getserveriso.sh /opt/app-root/src/
 
 USER 0
 
