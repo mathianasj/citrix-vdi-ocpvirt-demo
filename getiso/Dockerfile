@@ -5,7 +5,7 @@ COPY getserveriso.sh /opt/app-root/src/
 
 USER 0
 
-RUN dnf install -y python3-pip
+RUN dnf install -y python3-pip wget
 RUN pip install selenium
 RUN rm -rf /etc/rhsm-host
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
