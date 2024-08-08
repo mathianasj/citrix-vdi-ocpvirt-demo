@@ -1,10 +1,11 @@
-FROM registry.access.redhat.com/ubi9/python-311
+FROM quay.io/centos/centos:stream9
 
 COPY iso.py /opt/app-root/src/
 COPY getserveriso.sh /opt/app-root/src/
 
 USER 0
 
+RUN dnf install -y python3
 RUN pip install selenium
 RUN rm -rf /etc/rhsm-host
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm && \
